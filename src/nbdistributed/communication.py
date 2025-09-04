@@ -18,6 +18,7 @@ The communication is built on ZMQ's ROUTER-DEALER pattern, which enables:
 - Reliable message delivery
 """
 
+import os
 import zmq
 import pickle
 import threading
@@ -26,6 +27,8 @@ from typing import Any, Dict, List, Callable, Optional
 from dataclasses import dataclass
 import uuid
 
+TIMEOUT = os.get('NBDISTRIBUTED_TIMEOUT', 300)
+TIMEOUT = int(TIMEOUT)
 
 @dataclass
 class Message:
@@ -199,7 +202,7 @@ class CommunicationManager:
                 print(f"Error in message handler: {e}")
 
     def send_to_all(
-        self, msg_type: str, data: Any, timeout: float = 300.0
+        self, msg_type: str, data: Any, timeout: float = None
     ) -> Dict[int, Any]:
         """
         Send a message to all workers and collect responses.
@@ -226,6 +229,8 @@ class CommunicationManager:
             >>> print(responses)
             {0: {'output': '0\\n'}, 1: {'output': '1\\n'}}
         """
+        if timeout is None:
+            timeout = TIMEOUT
         msg_id = str(uuid.uuid4())
         message = Message(
             msg_id=msg_id,
@@ -254,7 +259,7 @@ class CommunicationManager:
             raise TimeoutError(f"Timeout waiting for responses to {msg_id}")
 
     def send_to_rank(
-        self, rank: int, msg_type: str, data: Any, timeout: float = 300.0
+        self, rank: int, msg_type: str, data: Any, timeout: float = None
     ) -> Any:
         """
         Send a message to a specific worker rank.
@@ -279,11 +284,13 @@ class CommunicationManager:
             >>> print(response)
             {'output': 'hello\\n'}
         """
+        if timeout is None:
+            timeout = TIMEOUT
         responses = self.send_to_ranks([rank], msg_type, data, timeout)
         return responses[rank]
 
     def send_to_ranks(
-        self, ranks: List[int], msg_type: str, data: Any, timeout: float = 300.0
+        self, ranks: List[int], msg_type: str, data: Any, timeout: float = None
     ) -> Dict[int, Any]:
         """
         Send a message to specific worker ranks.
@@ -311,6 +318,8 @@ class CommunicationManager:
             >>> print(responses)
             {0: {'output': '0\\n'}, 2: {'output': '2\\n'}}
         """
+        if timeout is None:
+            timeout = TIMEOUT
         msg_id = str(uuid.uuid4())
         message = Message(
             msg_id=msg_id, msg_type=msg_type, rank=-1, data=data, timestamp=time.time()
