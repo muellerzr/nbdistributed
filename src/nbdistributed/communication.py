@@ -199,7 +199,7 @@ class CommunicationManager:
                 print(f"Error in message handler: {e}")
 
     def send_to_all(
-        self, msg_type: str, data: Any, timeout: float = 30.0
+        self, msg_type: str, data: Any, timeout: float = 300.0
     ) -> Dict[int, Any]:
         """
         Send a message to all workers and collect responses.
@@ -254,7 +254,7 @@ class CommunicationManager:
             raise TimeoutError(f"Timeout waiting for responses to {msg_id}")
 
     def send_to_rank(
-        self, rank: int, msg_type: str, data: Any, timeout: float = 30.0
+        self, rank: int, msg_type: str, data: Any, timeout: float = 300.0
     ) -> Any:
         """
         Send a message to a specific worker rank.
@@ -283,7 +283,7 @@ class CommunicationManager:
         return responses[rank]
 
     def send_to_ranks(
-        self, ranks: List[int], msg_type: str, data: Any, timeout: float = 30.0
+        self, ranks: List[int], msg_type: str, data: Any, timeout: float = 300.0
     ) -> Dict[int, Any]:
         """
         Send a message to specific worker ranks.
