@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Callable, Optional
 from dataclasses import dataclass
 import uuid
 
-TIMEOUT = os.get('NBDISTRIBUTED_TIMEOUT', 300)
+TIMEOUT = os.environ.get('NBDISTRIBUTED_TIMEOUT', 300)
 TIMEOUT = int(TIMEOUT)
 
 @dataclass
